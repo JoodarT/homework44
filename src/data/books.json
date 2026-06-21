@@ -1,0 +1,18 @@
+[
+  {
+    "id": "b1ca23-4567",
+    "title": "Философия Java",
+    "author": "Брюс Эккель",
+    "image": "images/java_philosophy.png",
+    "status": "ISSUED",
+    "currentHolderId": "emp-uuid-111"
+  },
+  {
+    "id": "b2db89-0123",
+    "title": "Чистый код",
+    "author": "Роберт Мартин",
+    "image": "images/clean_code.png",
+    "status": "AVAILABLE",
+    "currentHolderId": null
+  }
+]

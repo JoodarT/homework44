@@ -1,0 +1,19 @@
+[
+  {
+    "id": "emp-uuid-111",
+    "fullName": "Владимир Путин",
+    "currentBooks": [
+      {
+        "bookId": "b1ca23-4567",
+        "issuedDate": "2026-06-15"
+      }
+    ],
+    "historyBooks": [
+      {
+        "bookId": "b2db89-0123",
+        "issuedDate": "2026-05-01",
+        "returnedDate": "2026-05-20"
+      }
+    ]
+  }
+]
