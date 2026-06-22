@@ -1,8 +1,11 @@
 package kg.attractor.java;
 
+import com.google.gson.Gson;
 import kg.attractor.java.lesson44.Lesson44Server;
 
 import java.io.IOException;
+
+
 
 public class Main {
     public static void main(String[] args) {
@@ -12,4 +15,12 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    Gson gson = new Gson();
+
+
+
+
+
+
 }

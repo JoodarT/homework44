@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="freemarker" level="project" />
+    <orderEntry type="library" name="vendor" level="project" />
   </component>
 </module>
