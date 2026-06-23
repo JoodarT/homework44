@@ -3,7 +3,7 @@ package repository;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import model.Book;
+import model.Employee;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -14,33 +14,33 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Repository {
+public class EmployeeRepository {
     private String dataDir = "data";
-    private String fileName = "books.json";
+    private String fileName = "employees.json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private List<Book> books = new ArrayList<>();
+    private List<Employee> employees = new ArrayList<>();
 
-    public Repository(){
-        loadBooks();
+    public EmployeeRepository(){
+        loadEmployee();
     }
 
-    private void loadBooks(){
+    private void loadEmployee(){
         Path path = Paths.get(dataDir, fileName);
         if (!Files.exists(path)){
             System.out.println("Файл " + fileName + " не найден, инициализирован пустой список.");
-            this.books = new ArrayList<>();
+            this.employees = new ArrayList<>();
             return;
         }
 
         try(Reader reader = Files.newBufferedReader(path)){
-            books = gson.fromJson(reader, new TypeToken<List<Book>>(){}.getType());
-            if (books == null) {
-                books = new ArrayList<>();
+            employees = gson.fromJson(reader, new TypeToken<List<Employee>>(){}.getType());
+            if (employees == null) {
+                employees = new ArrayList<>();
             }
         } catch (IOException e) {
-            System.out.println("Ошибка при чтении файла книг: " + e.getMessage());
-            books = new ArrayList<>();
+            System.out.println("Ошибка при чтении файла сотрудников: " + e.getMessage());
+            employees = new ArrayList<>();
         }
     }
 
@@ -48,20 +48,20 @@ public class Repository {
         Path path = Paths.get(dataDir, fileName);
 
         try (Writer writer = Files.newBufferedWriter(path)){
-            gson.toJson(books, writer);
+            gson.toJson(employees, writer);
         } catch (IOException e){
-            System.out.println("Ошибка при записи книг: " + e.getMessage());
+            System.out.println("Ошибка при записи Employee: " + e.getMessage());
         }
     }
 
-    public List<Book> findAll(){
-        return books;
+    public List<Employee> findAll(){
+        return employees;
     }
 
-    public Book findBook(int id){
-        for(Book book : books){
-            if (book.getId() == id){
-                return book;
+    public Employee findEmployee(int id){
+        for(Employee employee : employees){
+            if (employee.getIdEmployee() == id){
+                return employee;
             }
         }
         return null;
