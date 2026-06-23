@@ -7,6 +7,7 @@ import model.Book;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,10 +39,25 @@ public class Repository {
 
             books = gson.fromJson(reader, new TypeToken<List<Book>>(){}.getType());
 
-        }catch (IOException e){
+        }catch (IOException e) {
             System.out.printf("Ошибка при чтении файла книг" + e.getMessage());
+            books = new ArrayList<>();
         }
+
     }
+    public void savedAll(){
+        Path path = Paths.get(dataDir, fileName);
+
+        try (Writer writer = (Files.newBufferedWriter(path))){
+
+            gson.toJson(books, writer);
+        }catch (IOException e){
+            System.out.printf("Ошибка при записи книг "  + e.getMessage());
+        }
+
+    }
+
+
 
 
 }
