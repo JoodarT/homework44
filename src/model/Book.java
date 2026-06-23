@@ -6,13 +6,15 @@ public class Book {
     private String image;
     private BookStatus status;
     private int idEmployee;
+    private int currentHolderId;
 
-    public Book(int id, String author,  String image, BookStatus status, int idEmployee) {
+    public Book(int id, String author,  String image, BookStatus status, int idEmployee, int currentHolderId) {
         this.id = id;
         this.author = author;
         this.image = image;
         this.status = status;
         this.idEmployee = idEmployee;
+        this.currentHolderId = currentHolderId;
 
     }
 
