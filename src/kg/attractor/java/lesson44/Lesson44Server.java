@@ -8,29 +8,51 @@ import freemarker.template.TemplateExceptionHandler;
 import kg.attractor.java.server.BasicServer;
 import kg.attractor.java.server.ContentType;
 import kg.attractor.java.server.ResponseCodes;
+import model.Book;
+import model.Employee;
+import repository.Repository;
+import repository.EmployeeRepository;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Lesson44Server extends BasicServer {
     private final static Configuration freemarker = initFreeMarker();
 
+    private final Repository bookRepository = new Repository();
+    private final EmployeeRepository employeeRepository = new EmployeeRepository();
+
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
         registerGet("/sample", this::freemarkerSampleHandler);
+        registerGet("/books", this::booksHandler);
+        registerGet("/employees", this::employeesHandler);
+    }
+
+    private void booksHandler(HttpExchange exchange) {
+        List<Book> books = bookRepository.findAll();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("books", books);
+
+        renderTemplate(exchange, "books.html", data);
+    }
+
+    private void employeesHandler(HttpExchange exchange) {
+        List<Employee> employees = employeeRepository.findAll();
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("employees", employees);
+
+        renderTemplate(exchange, "employees.html", data);
     }
 
     private static Configuration initFreeMarker() {
         try {
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_29);
-
-
-            // путь к каталогу в котором у нас хранятся шаблоны
-            // это может быть совершенно другой путь, чем тот, откуда сервер берёт файлы
-            // которые отправляет пользователю
             cfg.setDirectoryForTemplateLoading(new File("templates"));
-
-            // прочие стандартные настройки о них читать тут
-            // https://freemarker.apache.org/docs/pgui_quickstart_createconfiguration.html
             cfg.setDefaultEncoding("UTF-8");
             cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
             cfg.setLogTemplateExceptions(false);
@@ -48,28 +70,12 @@ public class Lesson44Server extends BasicServer {
 
     protected void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel) {
         try {
-            // Загружаем шаблон из файла по имени.
-            // Шаблон должен находится по пути, указанном в конфигурации
             Template temp = freemarker.getTemplate(templateFile);
-
-            // freemarker записывает преобразованный шаблон в объект класса writer
-            // а наш сервер отправляет клиенту массивы байт
-            // по этому нам надо сделать "мост" между этими двумя системами
-
-            // создаём поток, который сохраняет всё, что в него будет записано в байтовый массив
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            // создаём объект, который умеет писать в поток и который подходит для freemarker
             try (OutputStreamWriter writer = new OutputStreamWriter(stream)) {
-
-                // обрабатываем шаблон заполняя его данными из модели
-                // и записываем результат в объект "записи"
                 temp.process(dataModel, writer);
                 writer.flush();
-
-                // получаем байтовый поток
                 var data = stream.toByteArray();
-
-                // отправляем результат клиенту
                 sendByteData(exchange, ResponseCodes.OK, ContentType.TEXT_HTML, data);
             }
         } catch (IOException | TemplateException e) {
@@ -78,8 +84,6 @@ public class Lesson44Server extends BasicServer {
     }
 
     private SampleDataModel getSampleDataModel() {
-        // возвращаем экземпляр тестовой модели-данных
-        // которую freemarker будет использовать для наполнения шаблона
         return new SampleDataModel();
     }
 }

@@ -1,25 +1,28 @@
 package model;
 
 public class Book {
-   private int id;
+    private String id;
+    private String title;
     private String author;
     private String image;
-    private BookStatus status;
-    private int idEmployee;
-    private int currentHolderId;
+    private String status;
+    private String currentHolderId;
 
-    public Book(int id, String author,  String image, BookStatus status, int idEmployee, int currentHolderId) {
+    public Book(String id, String title, String author, String image, String status, String currentHolderId) {
         this.id = id;
+        this.title = title;
         this.author = author;
         this.image = image;
         this.status = status;
-        this.idEmployee = idEmployee;
         this.currentHolderId = currentHolderId;
-
     }
 
-    public int getId() {
+    public String getId() {
         return id;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public String getAuthor() {
@@ -30,17 +33,11 @@ public class Book {
         return image;
     }
 
-    public BookStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public int getIdEmployee() {
-        return idEmployee;
+    public String getCurrentHolderId() {
+        return currentHolderId;
     }
-
-    public void setStatus(BookStatus status) {
-        this.status = status;
-    }
-
-
 }

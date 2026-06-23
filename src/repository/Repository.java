@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Repository {
-    private String dataDir = "data";
+    private String dataDir = "src/data";
     private String fileName = "books.json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -58,9 +58,9 @@ public class Repository {
         return books;
     }
 
-    public Book findBook(int id){
-        for(Book book : books){
-            if (book.getId() == id){
+    public Book findBook(String id) {
+        for (Book book : books) {
+            if (book.getId().equals(id)) {
                 return book;
             }
         }

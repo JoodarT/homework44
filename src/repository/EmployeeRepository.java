@@ -15,10 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeRepository {
-    private String dataDir = "data";
-    private String fileName = "employees.json";
+    private String dataDir = "src/data";
+    private String fileName = "employee.json";
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-
     private List<Employee> employees = new ArrayList<>();
 
     public EmployeeRepository(){
@@ -46,7 +45,6 @@ public class EmployeeRepository {
 
     public void saveAll(){
         Path path = Paths.get(dataDir, fileName);
-
         try (Writer writer = Files.newBufferedWriter(path)){
             gson.toJson(employees, writer);
         } catch (IOException e){
@@ -58,9 +56,9 @@ public class EmployeeRepository {
         return employees;
     }
 
-    public Employee findEmployee(int id){
+    public Employee findEmployee(String id){
         for(Employee employee : employees){
-            if (employee.getIdEmployee() == id){
+            if (employee.getIdEmployee().equals(id)){
                 return employee;
             }
         }

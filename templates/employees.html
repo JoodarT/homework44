@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Список сотрудников</title>
+</head>
+<body>
+<h1>Наши сотрудники</h1>
+<ul>
+  <#list employees as employee>
+  <li>
+    <h3>Имя: ${employee.fullname} (ID: ${employee.idEmployee})</h3>
+
+    <p><strong>Взятые книги сейчас:</strong></p>
+    <ul>
+      <#list employee.currentBooks as cb>
+      <li>ID Книги: ${cb.bookId} | Дата выдачи: ${cb.issuedDate}</li>
+      <#else>
+      <li>Нет взятых книг</li>
+    </#list>
+</ul>
+
+<p><strong>История книг:</strong></p>
+<ul>
+  <#list employee.historyBooks as hb>
+  <li>ID Книги: ${hb.bookId} | Взята: ${hb.issuedDate} | Вернул: ${hb.returnedDate}</li>
+  <#else>
+  <li>История пуста</li>
+</#list>
+</ul>
+</li>
+<hr>
+</#list>
+</ul>
+</body>
+</html>
