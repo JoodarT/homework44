@@ -57,6 +57,20 @@ public class Repository {
 
     }
 
+    public List<Book> findAll(){
+        return books;
+    }
+
+
+    public Book findBok(int id){
+        for(Book book : books){
+            if (book.getId() == id){
+                return book;
+            }
+        }return null;
+    }
+
+
 
 
 
