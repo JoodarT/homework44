@@ -26,9 +26,18 @@ public class Lesson44Server extends BasicServer {
 
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
+
+        registerGet("/", this::loginPageHandler);
+        registerGet("/index.html", this::loginPageHandler);
+
+
         registerGet("/sample", this::freemarkerSampleHandler);
         registerGet("/books", this::booksHandler);
         registerGet("/employees", this::employeesHandler);
+    }
+
+    private void loginPageHandler(HttpExchange httpExchange) {
+        renderTemplate(httpExchange, "index.html", new HashMap<>());
     }
 
     private void booksHandler(HttpExchange exchange) {
