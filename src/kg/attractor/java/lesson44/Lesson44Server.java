@@ -30,6 +30,9 @@ public class Lesson44Server extends BasicServer {
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
 
+        registerGet("/register", exchange -> authController.registerPage(exchange, this));
+        registerPost("/register", exchange -> authController.register(exchange, this));
+
         registerGet("/", this::loginPageHandler);
         registerGet("/index.html", this::loginPageHandler);
         registerGet("/login", this::loginPageHandler);
@@ -112,7 +115,7 @@ public class Lesson44Server extends BasicServer {
         renderTemplate(exchange, "sample.html", getSampleDataModel());
     }
 
-    protected void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel) {
+    public void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel) {
         try {
             Template temp = freemarker.getTemplate(templateFile);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();

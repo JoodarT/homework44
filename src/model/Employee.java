@@ -13,12 +13,20 @@ public class Employee {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public Employee(String id, String fullName, List<CurrentBook> currentBooks, List<HistoryBook> historyBooks) {
         this.id = id;
         this.fullName = fullName;
         this.currentBooks = currentBooks;
         this.historyBooks = historyBooks;
-        this.email = email;
+        this.email = id;
     }
 
     public String getIdEmployee() {
@@ -29,6 +37,10 @@ public class Employee {
         return fullName;
     }
 
+    public String getFullName() {
+        return fullName;
+    }
+
     public List<CurrentBook> getCurrentBooks() {
         return currentBooks;
     }
@@ -36,6 +48,13 @@ public class Employee {
     public List<HistoryBook> getHistoryBooks() {
         return historyBooks;
     }
+
+    public void setFullname(String name) {
+        this.fullName = name;
+
+    }
+
+
 
 
     public static class CurrentBook {

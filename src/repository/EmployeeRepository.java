@@ -74,5 +74,9 @@ public class EmployeeRepository {
         return null;
     }
 
+    public void save(Employee employee) {
+        employees.add(employee);
+    }
+
 
 }
