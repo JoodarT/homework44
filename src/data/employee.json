@@ -3,10 +3,44 @@
     "id": "emp-uuid-111",
     "fullName": "Владимир Путин",
     "email": "putin@mail.ru",
+    "password": "123",
     "currentBooks": [
       {
         "bookId": "b1ca23-4567",
         "issuedDate": "2026-06-15"
+      }
+    ],
+    "historyBooks": [
+      {
+        "bookId": "b2db89-0123",
+        "issuedDate": "2026-05-01",
+        "returnedDate": "2026-05-20"
+      }
+    ]
+  },
+  {
+    "id": "emp-uuid-222",
+    "fullName": "Егор Шевченко",
+    "email": "shevchenko@gmail.com",
+    "password": "qwerty",
+    "currentBooks": [],
+    "historyBooks": [
+      {
+        "bookId": "b1ca23-4567",
+        "issuedDate": "2026-04-10",
+        "returnedDate": "2026-04-30"
+      }
+    ]
+  },
+  {
+    "id": "emp-uuid-333",
+    "fullName": "Мария Сидорова",
+    "email": "sidorova@mail.ru",
+    "password": "password333",
+    "currentBooks": [
+      {
+        "bookId": "b3cc45-7890",
+        "issuedDate": "2026-06-20"
       }
     ],
     "historyBooks": [

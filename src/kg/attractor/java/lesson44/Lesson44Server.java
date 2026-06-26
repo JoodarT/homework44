@@ -45,6 +45,8 @@ public class Lesson44Server extends BasicServer {
 
         registerGet("/css/forms.css", this::staticFilesHandler);
         registerGet("/images/1.jpg", this::staticFilesHandler);
+
+        registerGet("/profile", exchange -> authController.profilePage(exchange, this));
     }
 
     protected final void registerPost(String route, kg.attractor.java.server.RouteHandler handler) {

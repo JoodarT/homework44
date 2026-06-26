@@ -5,6 +5,7 @@ import kg.attractor.java.lesson44.Lesson44Server;
 import kg.attractor.java.server.Utils;
 import model.Employee;
 import repository.EmployeeRepository;
+import service.AuthService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +22,21 @@ public class AuthController {
         this.employeeRepository = employeeRepository;
     }
 
+    public void profilePage(HttpExchange exchange, Lesson44Server server) {
+        Map<String, Object> data = new HashMap<>();
+
+        if (AuthService.isLoggedIn()) {
+            Employee user = AuthService.getCurrentUser();
+            data.put("name", user.getFullname());
+            data.put("email", user.getEmail());
+        } else {
+            data.put("name", "Некий пользователь");
+            data.put("email", "unknown@mail.com");
+        }
+
+        server.renderTemplate(exchange, "profile.html", data);
+    }
+
     public void login(HttpExchange exchange) {
         try {
             String rawBody = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8))
@@ -29,21 +45,25 @@ public class AuthController {
 
             Map<String, String> params = Utils.parseUrlEncoded(rawBody, "&");
             String email = params.get("email");
+            String password = params.get("password");
 
             Employee employee = employeeRepository.findByEmail(email);
 
-            if (employee != null) {
+            if (employee != null && password != null && password.equals(employee.getPassword())) {
                 System.out.println("Success login: " + employee.getFullname());
-                exchange.getResponseHeaders().set("Location", "/books");
+
+                AuthService.login(employee);
+
+                exchange.getResponseHeaders().set("Location", "/profile");
                 exchange.sendResponseHeaders(303, -1);
                 exchange.close();
             } else {
-                System.out.println("User not found: " + email);
+                System.out.println("Login failed for: " + email);
                 exchange.getResponseHeaders().set("Location", "/login");
                 exchange.sendResponseHeaders(303, -1);
                 exchange.close();
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -62,6 +82,7 @@ public class AuthController {
             Map<String, String> params = Utils.parseUrlEncoded(rawBody, "&");
             String email = params.get("email");
             String name = params.get("name");
+            String password = params.get("password");
 
             Employee existing = employeeRepository.findByEmail(email);
             Map<String, Object> data = new HashMap<>();
@@ -78,6 +99,8 @@ public class AuthController {
                 );
 
                 newEmployee.setEmail(email);
+                newEmployee.setPassword(password);
+
                 employeeRepository.save(newEmployee);
 
                 data.put("success", "Удачная регистрация!");
