@@ -5,6 +5,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import kg.attractor.java.server.AuthController;
 import kg.attractor.java.server.BasicServer;
 import kg.attractor.java.server.ContentType;
 import kg.attractor.java.server.ResponseCodes;
@@ -18,11 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 public class Lesson44Server extends BasicServer {
     private final static Configuration freemarker = initFreeMarker();
 
     private final Repository bookRepository = new Repository();
     private final EmployeeRepository employeeRepository = new EmployeeRepository();
+    private final AuthController authController = new AuthController(employeeRepository);
 
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
@@ -30,7 +33,7 @@ public class Lesson44Server extends BasicServer {
         registerGet("/", this::loginPageHandler);
         registerGet("/index.html", this::loginPageHandler);
         registerGet("/login", this::loginPageHandler);
-        registerPost("/login", this::loginHandler);
+        registerPost("/login", authController::login);
 
         registerGet("/sample", this::freemarkerSampleHandler);
         registerGet("/books", this::booksHandler);
@@ -38,6 +41,12 @@ public class Lesson44Server extends BasicServer {
 
         registerGet("/css/forms.css", this::staticFilesHandler);
         registerGet("/images/1.jpg", this::staticFilesHandler);
+    }
+
+    private void registerPost(String route, kg.attractor.java.server.RouteHandler handler) {
+
+        getRoutes().put("POST " + route, handler);
+
     }
 
     private void staticFilesHandler(HttpExchange httpExchange) {
@@ -69,39 +78,6 @@ public class Lesson44Server extends BasicServer {
 
     private void loginPageHandler(HttpExchange httpExchange) {
         renderTemplate(httpExchange, "index.html", new HashMap<>());
-    }
-
-    private void loginHandler(HttpExchange exchange) {
-        try {
-            InputStream inputStream = exchange.getRequestBody();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-            StringBuilder body = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                body.append(line);
-            }
-
-            String[] pairs = body.toString().split("&");
-            String email = "";
-            for (String pair : pairs) {
-                String[] keyValue = pair.split("=");
-                if (keyValue.length > 1 && keyValue[0].equals("email")) {
-                    email = java.net.URLDecoder.decode(keyValue[1], "UTF-8");
-                }
-            }
-
-            Employee employee = employeeRepository.findByEmail(email);
-
-            if (employee != null) {
-                System.out.println("Success login: " + employee.getFullname());
-                redirect303(exchange, "/books");
-            } else {
-                System.out.println("User not found: " + email);
-                redirect303(exchange, "/login");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void booksHandler(HttpExchange exchange) {
