@@ -33,6 +33,7 @@ public class Lesson44Server extends BasicServer {
         registerGet("/", this::loginPageHandler);
         registerGet("/index.html", this::loginPageHandler);
         registerGet("/login", this::loginPageHandler);
+
         registerPost("/login", authController::login);
 
         registerGet("/sample", this::freemarkerSampleHandler);
@@ -43,10 +44,8 @@ public class Lesson44Server extends BasicServer {
         registerGet("/images/1.jpg", this::staticFilesHandler);
     }
 
-    private void registerPost(String route, kg.attractor.java.server.RouteHandler handler) {
-
+    protected final void registerPost(String route, kg.attractor.java.server.RouteHandler handler) {
         getRoutes().put("POST " + route, handler);
-
     }
 
     private void staticFilesHandler(HttpExchange httpExchange) {
