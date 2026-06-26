@@ -29,32 +29,92 @@ public class Lesson44Server extends BasicServer {
 
         registerGet("/", this::loginPageHandler);
         registerGet("/index.html", this::loginPageHandler);
-
+        registerGet("/login", this::loginPageHandler);
+        registerPost("/login", this::loginHandler);
 
         registerGet("/sample", this::freemarkerSampleHandler);
         registerGet("/books", this::booksHandler);
         registerGet("/employees", this::employeesHandler);
+
+        registerGet("/css/forms.css", this::staticFilesHandler);
+        registerGet("/images/1.jpg", this::staticFilesHandler);
+    }
+
+    private void staticFilesHandler(HttpExchange httpExchange) {
+        try {
+            String pathStr = "templates" + httpExchange.getRequestURI().getPath();
+            java.nio.file.Path path = java.nio.file.Paths.get(pathStr);
+
+            if (java.nio.file.Files.exists(path)) {
+                byte[] data = java.nio.file.Files.readAllBytes(path);
+
+                ContentType contentType = ContentType.TEXT_PLAIN;
+                if (pathStr.endsWith(".css")) {
+                    contentType = ContentType.TEXT_CSS;
+                } else if (pathStr.endsWith(".jpg") || pathStr.endsWith(".jpeg")) {
+                    contentType = ContentType.IMAGE_JPEG;
+                } else if (pathStr.endsWith(".png")) {
+                    contentType = ContentType.IMAGE_PNG;
+                }
+
+                sendByteData(httpExchange, ResponseCodes.OK, contentType, data);
+            } else {
+                String notFound = "File not found";
+                sendByteData(httpExchange, ResponseCodes.NOT_FOUND, ContentType.TEXT_PLAIN, notFound.getBytes());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loginPageHandler(HttpExchange httpExchange) {
         renderTemplate(httpExchange, "index.html", new HashMap<>());
     }
 
+    private void loginHandler(HttpExchange exchange) {
+        try {
+            InputStream inputStream = exchange.getRequestBody();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            StringBuilder body = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                body.append(line);
+            }
+
+            String[] pairs = body.toString().split("&");
+            String email = "";
+            for (String pair : pairs) {
+                String[] keyValue = pair.split("=");
+                if (keyValue.length > 1 && keyValue[0].equals("email")) {
+                    email = java.net.URLDecoder.decode(keyValue[1], "UTF-8");
+                }
+            }
+
+            Employee employee = employeeRepository.findByEmail(email);
+
+            if (employee != null) {
+                System.out.println("Success login: " + employee.getFullname());
+                redirect303(exchange, "/books");
+            } else {
+                System.out.println("User not found: " + email);
+                redirect303(exchange, "/login");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void booksHandler(HttpExchange exchange) {
         List<Book> books = bookRepository.findAll();
-
         Map<String, Object> data = new HashMap<>();
         data.put("books", books);
-
         renderTemplate(exchange, "books.html", data);
     }
 
     private void employeesHandler(HttpExchange exchange) {
         List<Employee> employees = employeeRepository.findAll();
-
         Map<String, Object> data = new HashMap<>();
         data.put("employees", employees);
-
         renderTemplate(exchange, "employees.html", data);
     }
 

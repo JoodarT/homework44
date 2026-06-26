@@ -2,6 +2,7 @@
   {
     "id": "emp-uuid-111",
     "fullName": "Владимир Путин",
+    "email": "putin@mail.ru",
     "currentBooks": [
       {
         "bookId": "b1ca23-4567",
