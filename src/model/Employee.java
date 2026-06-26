@@ -8,6 +8,15 @@ public class Employee {
     private List<CurrentBook> currentBooks;
     private List<HistoryBook> historyBooks;
     private String email;
+    private  String password;
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 
     public String getEmail() {
         return email;
