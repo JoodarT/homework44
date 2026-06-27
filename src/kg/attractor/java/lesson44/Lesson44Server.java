@@ -13,6 +13,7 @@ import model.Book;
 import model.Employee;
 import repository.Repository;
 import repository.EmployeeRepository;
+import service.BookController;
 
 import java.io.*;
 import java.util.HashMap;
@@ -26,9 +27,12 @@ public class Lesson44Server extends BasicServer {
     private final Repository bookRepository = new Repository();
     private final EmployeeRepository employeeRepository = new EmployeeRepository();
     private final AuthController authController = new AuthController(employeeRepository);
+    private final BookController bookController = new BookController();
 
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
+
+        registerGet("/book", exchange -> bookController.showBookPage(exchange, this));
 
         registerGet("/register", exchange -> authController.registerPage(exchange, this));
         registerPost("/register", exchange -> authController.register(exchange, this));

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>${book.title}</title>
+  <link rel="stylesheet" href="/css/forms.css">
+  <style>
+    .book-card { max-width: 500px; margin: 50px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; font-family: sans-serif; }
+    .status { font-weight: bold; }
+    .available { color: green; }
+    .issued { color: red; }
+  </style>
+</head>
+<body>
+
+<div class="book-card">
+  <h1>${book.title}</h1>
+  <p><strong>Автор:</strong> ${book.author}</p>
+  <p><strong>ID Книги:</strong> ${book.id}</p>
+  <p><strong>Статус:</strong>
+    <#if book.status == "AVAILABLE">
+    <span class="status available">Свободна (На полке)</span>
+    <#else>
+    <span class="status issued">Выдана сотруднику</span>
+  </#if>
+  </p>
+
+  <#if book.currentHolderId??>
+  <p><strong>ID Читателя:</strong> ${book.currentHolderId}</p>
+</#if>
+
+<hr>
+<a href="/books" style="color: #007bff; text-decoration: none;">← Назад к списку книг</a>
+</div>
+
+</body>
+</html>
