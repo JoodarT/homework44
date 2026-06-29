@@ -5,8 +5,7 @@ import java.util.List;
 public class Employee {
     private String id;
     private String fullName;
-    private List<CurrentBook> currentBooks;
-    private List<HistoryBook> historyBooks;
+
     private String email;
     private  String password;
 
@@ -33,8 +32,7 @@ public class Employee {
     public Employee(String id, String fullName, List<CurrentBook> currentBooks, List<HistoryBook> historyBooks) {
         this.id = id;
         this.fullName = fullName;
-        this.currentBooks = currentBooks;
-        this.historyBooks = historyBooks;
+
         this.email = id;
     }
 
@@ -50,13 +48,8 @@ public class Employee {
         return fullName;
     }
 
-    public List<CurrentBook> getCurrentBooks() {
-        return currentBooks;
-    }
 
-    public List<HistoryBook> getHistoryBooks() {
-        return historyBooks;
-    }
+
 
     public void setFullname(String name) {
         this.fullName = name;
