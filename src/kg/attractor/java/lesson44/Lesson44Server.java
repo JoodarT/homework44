@@ -36,7 +36,7 @@ public class Lesson44Server extends BasicServer {
         registerGet("/books", exchange -> bookController.showBookPage(exchange, this));
 
         registerGet("/register", exchange -> authController.registerPage(exchange, this));
-//        registerPost("/register", exchange -> authController.register(exchange, this));
+
 
         registerGet("/", this::loginPageHandler);
         registerGet("/index.html", this::loginPageHandler);
