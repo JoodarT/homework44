@@ -5,10 +5,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import kg.attractor.java.server.AuthController;
-import kg.attractor.java.server.BasicServer;
-import kg.attractor.java.server.ContentType;
-import kg.attractor.java.server.ResponseCodes;
+import kg.attractor.java.server.*;
 import model.Book;
 import model.Employee;
 import repository.Repository;
@@ -29,8 +26,13 @@ public class Lesson44Server extends BasicServer {
     private final AuthController authController = new AuthController(employeeRepository);
     private final BookController bookController = new BookController();
 
+    private final CookieController cookieController = new CookieController();
+
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
+
+        registerGet("/cookie", exchange -> cookieController.lesson46Handler(exchange, this));
+
 
         registerGet("/book", exchange -> bookController.showBookDetailsPage(exchange, this));
         registerGet("/books", exchange -> bookController.showBookPage(exchange, this));
