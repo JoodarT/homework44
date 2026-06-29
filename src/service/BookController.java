@@ -13,6 +13,8 @@ public class BookController {
 
     private final BookRepository bookRepository = new BookRepository();
 
+
+
     public void showBookPage(HttpExchange exchange, Lesson44Server server){
 
         Map<String, Object> data = new HashMap<>();
@@ -26,7 +28,9 @@ public class BookController {
 
     public void showBookDetailsPage(HttpExchange exchange, Lesson44Server server) {
         String query = exchange.getRequestURI().getQuery();
+
         Map<String, String> params = Utils.parseUrlEncoded(query, "&");
+
         String bookId = params.get("id");
 
         Book book = bookRepository.findById(bookId);
@@ -36,10 +40,10 @@ public class BookController {
             data.put("book", book);
             server.renderTemplate(exchange, "book-info.html", data);
         } else {
-            String notFound = "Книга не найдена!";
+            String errorMsg = "Book with ID [" + bookId + "] not found!";
             try {
-                exchange.sendResponseHeaders(404, notFound.getBytes().length);
-                exchange.getResponseBody().write(notFound.getBytes());
+                exchange.sendResponseHeaders(404, errorMsg.getBytes().length);
+                exchange.getResponseBody().write(errorMsg.getBytes());
                 exchange.close();
             } catch (Exception e) {
                 e.printStackTrace();

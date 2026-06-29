@@ -32,7 +32,8 @@ public class Lesson44Server extends BasicServer {
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
 
-        registerGet("/book", exchange -> bookController.showBookPage(exchange, this));
+        registerGet("/book", exchange -> bookController.showBookDetailsPage(exchange, this));
+        registerGet("/books", exchange -> bookController.showBookPage(exchange, this));
 
         registerGet("/register", exchange -> authController.registerPage(exchange, this));
 //        registerPost("/register", exchange -> authController.register(exchange, this));
