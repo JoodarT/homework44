@@ -23,6 +23,18 @@ public class AuthController {
         this.employeeRepository = employeeRepository;
     }
 
+    public Employee getAuthorizedUser(HttpExchange exchange) {
+        String cookieHeader = exchange.getRequestHeaders().getFirst("Cookie");
+        if (cookieHeader != null && !cookieHeader.isBlank()) {
+            Map<String, String> cookies = Utils.parseUrlEncoded(cookieHeader.replace("; ", "&"), "&");
+            String sessionId = cookies.get("userId");
+            if (sessionId != null) {
+                return activeSessions.get(sessionId);
+            }
+        }
+        return null;
+    }
+
     public void logout(HttpExchange exchange, Lesson44Server server) {
         String cookieHeader = exchange.getRequestHeaders().getFirst("Cookie");
 
@@ -42,6 +54,7 @@ public class AuthController {
 
         redirectTo(exchange, "/login");
     }
+
 
     public void profilePage(HttpExchange exchange, Lesson44Server server) {
         Map<String, Object> data = new HashMap<>();

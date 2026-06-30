@@ -11,6 +11,7 @@ import model.Employee;
 import repository.Repository;
 import repository.EmployeeRepository;
 import service.BookController;
+import service.SecurityService;
 
 import java.io.*;
 import java.util.HashMap;
@@ -93,6 +94,8 @@ public class Lesson44Server extends BasicServer {
     }
 
     private void booksHandler(HttpExchange exchange) {
+
+        if (SecurityService.isNotAuthorized(exchange, authController)) return;
         List<Book> books = bookRepository.findAll();
         Map<String, Object> data = new HashMap<>();
         data.put("books", books);
@@ -100,6 +103,22 @@ public class Lesson44Server extends BasicServer {
     }
 
     private void employeesHandler(HttpExchange exchange) {
+
+        model.Employee user = authController.getAuthorizedUser(exchange);
+
+        if (user == null) {
+            try {
+                exchange.getResponseHeaders().set("Location", "/login");
+                exchange.sendResponseHeaders(303, -1);
+                exchange.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+        if (SecurityService.isNotAuthorized(exchange, authController)) return;
+
         List<Employee> employees = employeeRepository.findAll();
         Map<String, Object> data = new HashMap<>();
         data.put("employees", employees);
