@@ -5,9 +5,20 @@ import java.util.List;
 public class Employee {
     private String id;
     private String fullName;
-
     private String email;
-    private  String password;
+    private String password;
+    private EmployeeBooks books;
+
+    public Employee() {
+    }
+
+    public EmployeeBooks getBooks() {
+        return books;
+    }
+
+    public void setBooks(EmployeeBooks books) {
+        this.books = books;
+    }
 
     public void setPassword(String password) {
         this.password = password;
@@ -29,13 +40,6 @@ public class Employee {
         this.fullName = fullName;
     }
 
-    public Employee(String id, String fullName, List<CurrentBook> currentBooks, List<HistoryBook> historyBooks) {
-        this.id = id;
-        this.fullName = fullName;
-
-        this.email = id;
-    }
-
     public String getIdEmployee() {
         return id;
     }
@@ -48,16 +52,9 @@ public class Employee {
         return fullName;
     }
 
-
-
-
     public void setFullname(String name) {
         this.fullName = name;
-
     }
-
-
-
 
     public static class CurrentBook {
         private String bookId;
@@ -66,7 +63,6 @@ public class Employee {
         public String getBookId() { return bookId; }
         public String getIssuedDate() { return issuedDate; }
     }
-
 
     public static class HistoryBook {
         private String bookId;
@@ -77,6 +73,4 @@ public class Employee {
         public String getIssuedDate() { return issuedDate; }
         public String getReturnedDate() { return returnedDate; }
     }
-
-
 }

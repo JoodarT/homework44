@@ -2,10 +2,9 @@ package kg.attractor.java.server;
 
 import com.sun.net.httpserver.HttpExchange;
 import kg.attractor.java.lesson44.Lesson44Server;
-import kg.attractor.java.server.Utils;
 import model.Employee;
+import model.EmployeeBooks;
 import repository.EmployeeRepository;
-import service.AuthService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,10 +12,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class AuthController {
     private final EmployeeRepository employeeRepository;
+    private final Map<String, Employee> activeSessions = new HashMap<>();
 
     public AuthController(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
@@ -24,17 +25,31 @@ public class AuthController {
 
     public void profilePage(HttpExchange exchange, Lesson44Server server) {
         Map<String, Object> data = new HashMap<>();
+        Employee user = null;
 
-        if (AuthService.isLoggedIn()) {
-            Employee user = AuthService.getCurrentUser();
-            data.put("name", user.getFullname());
-            data.put("email", user.getEmail());
-        } else {
-            data.put("name", "Некий пользователь");
-            data.put("email", "unknown@mail.com");
+        String cookieHeader = exchange.getRequestHeaders().getFirst("Cookie");
+
+        if (cookieHeader != null && !cookieHeader.isBlank()) {
+            Map<String, String> cookies = Utils.parseUrlEncoded(cookieHeader.replace("; ", "&"), "&");
+            String sessionId = cookies.get("userId");
+
+            if (sessionId != null) {
+                user = activeSessions.get(sessionId);
+            }
         }
 
-        server.renderTemplate(exchange, "profile.html", data);
+        if (user != null) {
+            data.put("name", user.getFullname());
+            data.put("email", user.getEmail());
+
+            if (user.getBooks() != null) {
+                data.put("books", user.getBooks());
+            }
+
+            server.renderTemplate(exchange, "profile.html", data);
+        } else {
+            redirectTo(exchange, "/login");
+        }
     }
 
     public void login(HttpExchange exchange) {
@@ -52,16 +67,19 @@ public class AuthController {
             if (employee != null && password != null && password.equals(employee.getPassword())) {
                 System.out.println("Success login: " + employee.getFullname());
 
-                AuthService.login(employee);
+                String sessionId = UUID.randomUUID().toString();
+                activeSessions.put(sessionId, employee);
 
-                exchange.getResponseHeaders().set("Location", "/profile");
-                exchange.sendResponseHeaders(303, -1);
-                exchange.close();
+                Cookie<String> sessionCookie = Cookie.make("userId", sessionId);
+                sessionCookie.setMaxAge(600);
+                sessionCookie.setHttpOnly(true);
+
+                exchange.getResponseHeaders().add("Set-Cookie", sessionCookie.toString());
+
+                redirectTo(exchange, "/profile");
             } else {
                 System.out.println("Login failed for: " + email);
-                exchange.getResponseHeaders().set("Location", "/login");
-                exchange.sendResponseHeaders(303, -1);
-                exchange.close();
+                redirectTo(exchange, "/login");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -69,7 +87,7 @@ public class AuthController {
     }
 
     public void registerPage(HttpExchange exchange, Lesson44Server server) {
-        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        Map<String, Object> data = new HashMap<>();
         server.renderTemplate(exchange, "register.html", data);
     }
 
@@ -91,15 +109,11 @@ public class AuthController {
                 data.put("error", "Регистрация не удалась: пользователь с таким email уже существует!");
                 server.renderTemplate(exchange, "register.html", data);
             } else {
-                Employee newEmployee = new Employee(
-                        email,
-                        name,
-                        new java.util.ArrayList<>(),
-                        new java.util.ArrayList<>()
-                );
-
+                Employee newEmployee = new Employee();
                 newEmployee.setEmail(email);
+                newEmployee.setFullname(name);
                 newEmployee.setPassword(password);
+                newEmployee.setBooks(new EmployeeBooks());
 
                 employeeRepository.save(newEmployee);
 
@@ -107,6 +121,16 @@ public class AuthController {
                 server.renderTemplate(exchange, "register.html", data);
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void redirectTo(HttpExchange exchange, String location) {
+        try {
+            exchange.getResponseHeaders().set("Location", location);
+            exchange.sendResponseHeaders(303, -1);
+            exchange.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

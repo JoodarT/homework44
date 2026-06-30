@@ -61,11 +61,7 @@ public class Cookie<V> {
     return sb.toString();
 
   }
-//
-//  Cookie<String> c = Cookie.make("user_session", "active-uuid-123");
-//  c.setMaxAge(3600);
-//  c.setHttpOnly(true);
-//  exchange.getResponseHeaders().add("Set-Cookie", c.toString());
+
 
 
 }
