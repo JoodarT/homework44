@@ -18,14 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class Lesson44Server extends BasicServer {
     private final static Configuration freemarker = initFreeMarker();
 
     private final Repository bookRepository = new Repository();
     private final EmployeeRepository employeeRepository = new EmployeeRepository();
     private final AuthController authController = new AuthController(employeeRepository);
-    private final BookController bookController = new BookController();
+    private final BookController bookController = new BookController(authController, employeeRepository);
 
     private final CookieController cookieController = new CookieController();
 
@@ -34,13 +33,16 @@ public class Lesson44Server extends BasicServer {
 
         registerGet("/cookie", exchange -> cookieController.lesson46Handler(exchange, this));
 
-        registerGet("/logout", exchange -> authController.logout(exchange, this));
+        registerPost("/logout", exchange -> authController.logout(exchange, this));
 
         registerGet("/book", exchange -> bookController.showBookDetailsPage(exchange, this));
         registerGet("/books", exchange -> bookController.showBookPage(exchange, this));
 
-        registerGet("/register", exchange -> authController.registerPage(exchange, this));
+        registerPost("/take-book", exchange -> bookController.takeBook(exchange));
+        registerPost("/return-book", exchange -> bookController.returnBook(exchange));
 
+        registerGet("/register", exchange -> authController.registerPage(exchange, this));
+        registerPost("/register", exchange -> authController.register(exchange, this));
 
         registerGet("/", this::loginPageHandler);
         registerGet("/index.html", this::loginPageHandler);
@@ -49,7 +51,6 @@ public class Lesson44Server extends BasicServer {
         registerPost("/login", authController::login);
 
         registerGet("/sample", this::freemarkerSampleHandler);
-        registerGet("/books", this::booksHandler);
         registerGet("/employees", this::employeesHandler);
 
         registerGet("/css/forms.css", this::staticFilesHandler);
@@ -93,30 +94,7 @@ public class Lesson44Server extends BasicServer {
         renderTemplate(httpExchange, "index.html", new HashMap<>());
     }
 
-    private void booksHandler(HttpExchange exchange) {
-
-        if (SecurityService.isNotAuthorized(exchange, authController)) return;
-        List<Book> books = bookRepository.findAll();
-        Map<String, Object> data = new HashMap<>();
-        data.put("books", books);
-        renderTemplate(exchange, "books.html", data);
-    }
-
     private void employeesHandler(HttpExchange exchange) {
-
-        model.Employee user = authController.getAuthorizedUser(exchange);
-
-        if (user == null) {
-            try {
-                exchange.getResponseHeaders().set("Location", "/login");
-                exchange.sendResponseHeaders(303, -1);
-                exchange.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
-
         if (SecurityService.isNotAuthorized(exchange, authController)) return;
 
         List<Employee> employees = employeeRepository.findAll();
