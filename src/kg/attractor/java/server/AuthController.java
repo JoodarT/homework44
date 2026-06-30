@@ -23,6 +23,26 @@ public class AuthController {
         this.employeeRepository = employeeRepository;
     }
 
+    public void logout(HttpExchange exchange, Lesson44Server server) {
+        String cookieHeader = exchange.getRequestHeaders().getFirst("Cookie");
+
+        if (cookieHeader != null && !cookieHeader.isBlank()) {
+            Map<String, String> cookies = Utils.parseUrlEncoded(cookieHeader.replace("; ", "&"), "&");
+            String sessionId = cookies.get("userId");
+
+            if (sessionId != null) {
+                activeSessions.remove(sessionId);
+            }
+        }
+
+        Cookie<String> deleteCookie = Cookie.make("userId", "");
+        deleteCookie.setMaxAge(0);
+        deleteCookie.setHttpOnly(true);
+        exchange.getResponseHeaders().add("Set-Cookie", deleteCookie.toString());
+
+        redirectTo(exchange, "/login");
+    }
+
     public void profilePage(HttpExchange exchange, Lesson44Server server) {
         Map<String, Object> data = new HashMap<>();
         Employee user = null;

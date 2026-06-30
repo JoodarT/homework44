@@ -33,6 +33,7 @@ public class Lesson44Server extends BasicServer {
 
         registerGet("/cookie", exchange -> cookieController.lesson46Handler(exchange, this));
 
+        registerGet("/logout", exchange -> authController.logout(exchange, this));
 
         registerGet("/book", exchange -> bookController.showBookDetailsPage(exchange, this));
         registerGet("/books", exchange -> bookController.showBookPage(exchange, this));
