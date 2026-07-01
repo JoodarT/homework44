@@ -3,18 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <title>Список книг</title>
+    <link rel="stylesheet" href="/css/forms.css">
+    <style>
+        .container { max-width: 600px; margin: 50px auto; font-family: sans-serif; }
+        .book-item { padding: 15px 0; list-style-type: none; }
+        .status-available { color: green; font-weight: bold; }
+        .status-issued { color: red; font-weight: bold; }
+        .holder-info { font-size: 14px; color: #555; background: #eee; padding: 2px 6px; border-radius: 4px; }
+    </style>
 </head>
 <body>
-<h1>Доступные книги</h1>
-<ul>
-    <#list books as book>
-    <li>
-        <strong>${book.title}</strong> — ${book.author} <br>
-        Статус: ${book.status} <br>
-        <#if book.currentHolderId??>Кто взял (ID): ${book.currentHolderId}</#if>
+
+<div class="container">
+    <h1>Доступные книги</h1>
+    <a href="/profile" style="text-decoration: none; color: #007bff;">← В профиль</a>
+
+    <hr style="margin-top: 20px;">
+
+    <ul>
+        <#list books as book>
+        <li class="book-item">
+            <a href="/book?id=${book.id}"><strong>${book.title}</strong></a> — ${book.author} <br>
+            Статус:
+            <#if book.status == "AVAILABLE">
+            <span class="status-available">Свободна</span>
+            <#else>
+            <span class="status-issued">Выдана</span>
+        </#if>
+        <br>
+
+        <#if book.currentHolderId??>
+        <span class="holder-info">Кто взял (ID): ${book.currentHolderId}</span>
+    </#if>
     </li>
-    <hr>
+
+    <hr style="border: 0; border-top: 1px solid #eee;">
 </#list>
 </ul>
+</div>
+
 </body>
 </html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="/css/forms.css">
+    <style>
+        .profile-container { max-width: 600px; margin: 50px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-family: sans-serif; }
+        .profile-header { border-bottom: 2px solid #007bff; padding-bottom: 10px; margin-bottom: 20px; }
+        .info-group { margin-bottom: 15px; font-size: 16px; }
+        .info-label { font-weight: bold; color: #555; }
+        .btn-logout { background-color: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-return { background-color: #ffc107; color: #212529; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .books-section { margin-top: 25px; }
+        .books-list { list-style: none; padding: 0; }
+        .books-list li { padding: 8px 0; border-bottom: 1px dashed #eee; display: flex; justify-content: space-between; align-items: center; }
+    </style>
+</head>
+<body>
+
+<div class="profile-container">
+    <div class="profile-header">
+        <h2>Профиль сотрудника</h2>
+    </div>
+
+    <div class="info-group">
+        <span class="info-label">Имя / ФИО:</span>
+        <span>${name}</span>
+    </div>
+
+    <div class="info-group">
+        <span class="info-label">Электронная почта:</span>
+        <span>${email}</span>
+    </div>
+
+    <div class="books-section">
+        <h3>Взятые книги:</h3>
+        <ul class="books-list">
+            <#list (books.currentBooks)![] as currentBook>
+            <li>
+                <span>ID Книги: <strong>${currentBook.bookId}</strong> (Выдана: ${currentBook.issuedDate})</span>
+                <form action="/return-book" method="POST" style="display: inline;">
+                    <input type="hidden" name="bookId" value="${currentBook.bookId}">
+                    <button type="submit" class="btn-return">Вернуть</button>
+                </form>
+            </li>
+            <#else>
+            <li style="color: #888; border: none;">У вас нет взятых книг.</li>
+        </#list>
+        </ul>
+    </div>
+
+    <div class="books-section">
+        <h3>История чтения:</h3>
+        <ul class="books-list">
+            <#list (books.historyBooks)![] as historyBook>
+            <li style="color: #666;">
+                ID Книги: ${historyBook.bookId} — Возвращена: ${historyBook.returnedDate} (Брал: ${historyBook.issuedDate})
+            </li>
+            <#else>
+            <li style="color: #888; border: none;">История пуста.</li>
+        </#list>
+        </ul>
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+    <form action="/logout" method="GET">
+        <a href="/logout" class="btn-logout">Выйти из системы</a>
+    </form>
+</div>
+
+</body>
+</html>

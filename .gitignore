@@ -1,4 +1,5 @@
 # Скомпилированные файлы (байт-код)
+
 *.class
 *.log
 *.ctxt
@@ -44,3 +45,12 @@ out/
 .DS_Store
 Thumbs.db
 
+# Файлы настроек IntelliJ IDEA
+*.iml
+.idea/
+
+# Скомпилированные файлы и папки сборщиков
+*.class
+target/
+out/
+build/

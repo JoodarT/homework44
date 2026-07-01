@@ -3,16 +3,41 @@ package model;
 import java.util.List;
 
 public class Employee {
-    private String id; // В JSON поле называется "id"
-    private String fullName; // В JSON поле называется "fullName" (с большой N)
-    private List<CurrentBook> currentBooks;
-    private List<HistoryBook> historyBooks;
+    private String id;
+    private String fullName;
+    private String email;
+    private String password;
+    private EmployeeBooks books;
 
-    public Employee(String id, String fullName, List<CurrentBook> currentBooks, List<HistoryBook> historyBooks) {
-        this.id = id;
+    public Employee() {
+    }
+
+    public EmployeeBooks getBooks() {
+        return books;
+    }
+
+    public void setBooks(EmployeeBooks books) {
+        this.books = books;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setFullName(String fullName) {
         this.fullName = fullName;
-        this.currentBooks = currentBooks;
-        this.historyBooks = historyBooks;
     }
 
     public String getIdEmployee() {
@@ -23,15 +48,14 @@ public class Employee {
         return fullName;
     }
 
-    public List<CurrentBook> getCurrentBooks() {
-        return currentBooks;
+    public String getFullName() {
+        return fullName;
     }
 
-    public List<HistoryBook> getHistoryBooks() {
-        return historyBooks;
+    public void setFullname(String name) {
+        this.fullName = name;
     }
 
-    // Вспомогательный класс для текущих книг
     public static class CurrentBook {
         private String bookId;
         private String issuedDate;
@@ -40,7 +64,6 @@ public class Employee {
         public String getIssuedDate() { return issuedDate; }
     }
 
-    // Вспомогательный класс для истории книг
     public static class HistoryBook {
         private String bookId;
         private String issuedDate;

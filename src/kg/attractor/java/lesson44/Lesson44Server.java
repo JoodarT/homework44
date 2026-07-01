@@ -5,13 +5,13 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
-import kg.attractor.java.server.BasicServer;
-import kg.attractor.java.server.ContentType;
-import kg.attractor.java.server.ResponseCodes;
+import kg.attractor.java.server.*;
 import model.Book;
 import model.Employee;
 import repository.Repository;
 import repository.EmployeeRepository;
+import service.BookController;
+import service.SecurityService;
 
 import java.io.*;
 import java.util.HashMap;
@@ -23,29 +23,83 @@ public class Lesson44Server extends BasicServer {
 
     private final Repository bookRepository = new Repository();
     private final EmployeeRepository employeeRepository = new EmployeeRepository();
+    private final AuthController authController = new AuthController(employeeRepository);
+    private final BookController bookController = new BookController(authController, employeeRepository);
+
+    private final CookieController cookieController = new CookieController();
 
     public Lesson44Server(String host, int port) throws IOException {
         super(host, port);
+
+        registerGet("/cookie", exchange -> cookieController.lesson46Handler(exchange, this));
+
+        registerPost("/logout", exchange -> authController.logout(exchange, this));
+
+        registerGet("/book", exchange -> bookController.showBookDetailsPage(exchange, this));
+        registerGet("/books", exchange -> bookController.showBookPage(exchange, this));
+
+        registerPost("/take-book", exchange -> bookController.takeBook(exchange));
+        registerPost("/return-book", exchange -> bookController.returnBook(exchange));
+
+        registerGet("/register", exchange -> authController.registerPage(exchange, this));
+        registerPost("/register", exchange -> authController.register(exchange, this));
+
+        registerGet("/", this::loginPageHandler);
+        registerGet("/index.html", this::loginPageHandler);
+        registerGet("/login", this::loginPageHandler);
+
+        registerPost("/login", authController::login);
+
         registerGet("/sample", this::freemarkerSampleHandler);
-        registerGet("/books", this::booksHandler);
         registerGet("/employees", this::employeesHandler);
+
+        registerGet("/css/forms.css", this::staticFilesHandler);
+        registerGet("/images/1.jpg", this::staticFilesHandler);
+
+        registerGet("/profile", exchange -> authController.profilePage(exchange, this));
     }
 
-    private void booksHandler(HttpExchange exchange) {
-        List<Book> books = bookRepository.findAll();
+    protected final void registerPost(String route, kg.attractor.java.server.RouteHandler handler) {
+        getRoutes().put("POST " + route, handler);
+    }
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("books", books);
+    private void staticFilesHandler(HttpExchange httpExchange) {
+        try {
+            String pathStr = "templates" + httpExchange.getRequestURI().getPath();
+            java.nio.file.Path path = java.nio.file.Paths.get(pathStr);
 
-        renderTemplate(exchange, "books.html", data);
+            if (java.nio.file.Files.exists(path)) {
+                byte[] data = java.nio.file.Files.readAllBytes(path);
+
+                ContentType contentType = ContentType.TEXT_PLAIN;
+                if (pathStr.endsWith(".css")) {
+                    contentType = ContentType.TEXT_CSS;
+                } else if (pathStr.endsWith(".jpg") || pathStr.endsWith(".jpeg")) {
+                    contentType = ContentType.IMAGE_JPEG;
+                } else if (pathStr.endsWith(".png")) {
+                    contentType = ContentType.IMAGE_PNG;
+                }
+
+                sendByteData(httpExchange, ResponseCodes.OK, contentType, data);
+            } else {
+                String notFound = "File not found";
+                sendByteData(httpExchange, ResponseCodes.NOT_FOUND, ContentType.TEXT_PLAIN, notFound.getBytes());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loginPageHandler(HttpExchange httpExchange) {
+        renderTemplate(httpExchange, "index.html", new HashMap<>());
     }
 
     private void employeesHandler(HttpExchange exchange) {
-        List<Employee> employees = employeeRepository.findAll();
+        if (SecurityService.isNotAuthorized(exchange, authController)) return;
 
+        List<Employee> employees = employeeRepository.findAll();
         Map<String, Object> data = new HashMap<>();
         data.put("employees", employees);
-
         renderTemplate(exchange, "employees.html", data);
     }
 
@@ -68,7 +122,7 @@ public class Lesson44Server extends BasicServer {
         renderTemplate(exchange, "sample.html", getSampleDataModel());
     }
 
-    protected void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel) {
+    public void renderTemplate(HttpExchange exchange, String templateFile, Object dataModel) {
         try {
             Template temp = freemarker.getTemplate(templateFile);
             ByteArrayOutputStream stream = new ByteArrayOutputStream();

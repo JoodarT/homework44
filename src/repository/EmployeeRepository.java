@@ -64,4 +64,19 @@ public class EmployeeRepository {
         }
         return null;
     }
+
+    public Employee findByEmail(String email) {
+        for (Employee employee : employees) {
+            if (employee.getEmail() != null && employee.getEmail().equalsIgnoreCase(email)) {
+                return employee;
+            }
+        }
+        return null;
+    }
+
+    public void save(Employee employee) {
+        employees.add(employee);
+    }
+
+
 }

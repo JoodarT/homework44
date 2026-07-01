@@ -18,9 +18,4 @@ public class Main {
 
     Gson gson = new Gson();
 
-
-
-
-
-
 }
